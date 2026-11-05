@@ -1,21 +1,23 @@
 `timescale 1ns/1ps
 
-module boot_menu_controller (
+// RetroFPGA Tutorial 009
+// Six-architecture boot menu controller.
+
+module boot_menu_controller #(
+    parameter logic [5:0] IMPLEMENTED_CORES = 6'b000000
+) (
     input  logic clk,
     input  logic rst,
 
-    // One-cycle button events from Tutorial 006.
     input  logic up_pressed,
     input  logic down_pressed,
     input  logic select_pressed,
     input  logic back_pressed,
 
-    // Menu display interface.
-    output logic [1:0] selected_index,
+    output logic [2:0] selected_index,
     output logic       menu_active,
 
-    // Core launch interface.
-    output logic [1:0] boot_core,
+    output logic [2:0] boot_core,
     output logic       boot_request,
     output logic       booting
 );
@@ -27,55 +29,53 @@ module boot_menu_controller (
 
     state_t state;
 
-    // State and output registers.
+    logic core_valid;
+    logic core_available;
+
+    core_registry #(
+        .IMPLEMENTED_CORES(IMPLEMENTED_CORES)
+    ) registry (
+        .core_id(selected_index),
+        .core_valid(core_valid),
+        .core_available(core_available)
+    );
+
     always_ff @(posedge clk) begin
         if (rst) begin
             state          <= STATE_MENU;
-            selected_index <= 2'd0;
-            boot_core      <= 2'd0;
+            selected_index <= 3'd0;
+            boot_core      <= 3'd0;
             boot_request   <= 1'b0;
         end else begin
-
-            // A boot request lasts exactly one clock cycle.
             boot_request <= 1'b0;
 
             case (state)
 
                 STATE_MENU: begin
-
-                    // Priority:
-                    // SELECT > UP > DOWN
-                    // BACK is ignored in MENU.
+                    // Priority: SELECT > UP > DOWN.
 
                     if (select_pressed) begin
-
-                        boot_core    <= selected_index;
-                        boot_request <= 1'b1;
-                        state        <= STATE_BOOTING;
-
+                        if (core_valid && core_available) begin
+                            boot_core    <= selected_index;
+                            boot_request <= 1'b1;
+                            state        <= STATE_BOOTING;
+                        end
                     end else if (up_pressed) begin
-
-                        // Wrap from Z80 to Game Boy.
-                        selected_index <=
-                            selected_index - 2'd1;
-
+                        if (selected_index == 3'd0)
+                            selected_index <= 3'd5;
+                        else
+                            selected_index <= selected_index - 3'd1;
                     end else if (down_pressed) begin
-
-                        // Wrap from Game Boy to Z80.
-                        selected_index <=
-                            selected_index + 2'd1;
-
+                        if (selected_index == 3'd5)
+                            selected_index <= 3'd0;
+                        else
+                            selected_index <= selected_index + 3'd1;
                     end
-
                 end
 
                 STATE_BOOTING: begin
-
-                    // Navigation is disabled after selection.
-                    // BACK returns to the menu.
                     if (back_pressed)
                         state <= STATE_MENU;
-
                 end
 
                 default: begin
@@ -86,7 +86,6 @@ module boot_menu_controller (
         end
     end
 
-    // State indicators.
     always_comb begin
         menu_active = (state == STATE_MENU);
         booting     = (state == STATE_BOOTING);

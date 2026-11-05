@@ -2,7 +2,8 @@
 
 module retrofpga_top #(
     parameter int unsigned DEBOUNCE_CLK_FREQ_HZ = 100_000_000,
-    parameter int unsigned DEBOUNCE_MS = 10
+    parameter int unsigned DEBOUNCE_MS = 10,
+    parameter logic [5:0] IMPLEMENTED_CORES = 6'b000000
 ) (
     input  logic clk,
     input  logic btn_reset,
@@ -13,7 +14,7 @@ module retrofpga_top #(
     output logic hsync,
     output logic vsync,
     output logic [3:0] vga_r, vga_g, vga_b,
-    output logic [1:0] led_selected,
+    output logic [2:0] led_selected,
     output logic led_booting
 );
     // Asynchronous assertion, synchronous release of reset.
@@ -31,8 +32,8 @@ module retrofpga_top #(
     logic pixel_ce, video_active;
     logic [9:0] x, y;
     logic up_pressed, down_pressed, select_pressed, back_pressed;
-    logic [1:0] selected_index, boot_core;
-    logic menu_active, boot_request, booting;
+    logic [2:0] selected_index, unused_boot_core;
+    logic menu_active, unused_boot_request, booting;
     logic [3:0] title_r, title_g, title_b;
     logic [11:0] menu_rgb, final_rgb;
     logic menu_opaque;
@@ -41,25 +42,32 @@ module retrofpga_top #(
     vga_timing timing (.clk(clk), .rst(reset_sync), .pixel_ce(pixel_ce),
         .hsync(hsync), .vsync(vsync), .video_active(video_active), .x(x), .y(y));
 
+    /* verilator lint_off PINCONNECTEMPTY */
     button_debounce #(.CLK_FREQ_HZ(DEBOUNCE_CLK_FREQ_HZ), .DEBOUNCE_MS(DEBOUNCE_MS))
         up_filter (.clk(clk), .rst(reset_sync), .button_in(btn_up),
                    .level(), .pressed(up_pressed), .released());
+    /* verilator lint_off PINCONNECTEMPTY */
     button_debounce #(.CLK_FREQ_HZ(DEBOUNCE_CLK_FREQ_HZ), .DEBOUNCE_MS(DEBOUNCE_MS))
         down_filter (.clk(clk), .rst(reset_sync), .button_in(btn_down),
                      .level(), .pressed(down_pressed), .released());
+    /* verilator lint_off PINCONNECTEMPTY */
     button_debounce #(.CLK_FREQ_HZ(DEBOUNCE_CLK_FREQ_HZ), .DEBOUNCE_MS(DEBOUNCE_MS))
         select_filter (.clk(clk), .rst(reset_sync), .button_in(btn_select),
                        .level(), .pressed(select_pressed), .released());
+    /* verilator lint_off PINCONNECTEMPTY */
     button_debounce #(.CLK_FREQ_HZ(DEBOUNCE_CLK_FREQ_HZ), .DEBOUNCE_MS(DEBOUNCE_MS))
         back_filter (.clk(clk), .rst(reset_sync), .button_in(btn_back),
                      .level(), .pressed(back_pressed), .released());
 
-    boot_menu_controller controller (
+    /* verilator lint_on PINCONNECTEMPTY */
+    boot_menu_controller #(
+    .IMPLEMENTED_CORES(IMPLEMENTED_CORES)
+) controller (
         .clk(clk), .rst(reset_sync), .up_pressed(up_pressed),
         .down_pressed(down_pressed), .select_pressed(select_pressed),
         .back_pressed(back_pressed), .selected_index(selected_index),
-        .menu_active(menu_active), .boot_core(boot_core),
-        .boot_request(boot_request), .booting(booting));
+        .menu_active(menu_active), .boot_core(unused_boot_core),
+        .boot_request(unused_boot_request), .booting(booting));
 
     text_renderer title (.x(x), .y(y), .video_active(video_active),
         .vga_r(title_r), .vga_g(title_g), .vga_b(title_b));

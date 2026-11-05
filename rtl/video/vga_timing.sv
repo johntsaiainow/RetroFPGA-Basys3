@@ -20,13 +20,11 @@ module vga_timing (
     localparam logic [9:0] H_VISIBLE = 10'd640;
     localparam logic [9:0] H_FRONT   = 10'd16;
     localparam logic [9:0] H_SYNC    = 10'd96;
-    localparam logic [9:0] H_BACK    = 10'd48;
     localparam logic [9:0] H_TOTAL   = 10'd800;
 
     localparam logic [9:0] V_VISIBLE = 10'd480;
     localparam logic [9:0] V_FRONT   = 10'd10;
     localparam logic [9:0] V_SYNC    = 10'd2;
-    localparam logic [9:0] V_BACK    = 10'd33;
     localparam logic [9:0] V_TOTAL   = 10'd525;
 
     logic [9:0] h_count;

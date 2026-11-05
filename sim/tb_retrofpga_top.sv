@@ -2,18 +2,18 @@
 module tb_retrofpga_top;
     logic clk=0;
     logic btn_reset=1, btn_up=0, btn_down=0, btn_select=0, btn_back=0;
-    wire hsync,vsync;
+    wire hsync,unused_vsync;
     wire [3:0] vga_r,vga_g,vga_b;
-    wire [1:0] led_selected;
+    wire [2:0] led_selected;
     wire led_booting;
     int tests=0;
-    always #5 clk=~clk;
+    always #5 clk <= ~clk;
     retrofpga_top #(.DEBOUNCE_CLK_FREQ_HZ(1000),.DEBOUNCE_MS(1)) dut (
         .clk(clk),.btn_reset(btn_reset),.btn_up(btn_up),.btn_down(btn_down),
         .btn_select(btn_select),.btn_back(btn_back),
-        .hsync(hsync),.vsync(vsync),.vga_r(vga_r),.vga_g(vga_g),.vga_b(vga_b),
+        .hsync(hsync),.vsync(unused_vsync),.vga_r(vga_r),.vga_g(vga_g),.vga_b(vga_b),
         .led_selected(led_selected),.led_booting(led_booting));
-    task automatic check(input logic [1:0] index, input logic booting);
+    task automatic check(input logic [2:0] index, input logic booting);
         @(negedge clk);
         if (led_selected !== index || led_booting !== booting)
             $fatal(1,"state mismatch: index=%0d boot=%b",led_selected,led_booting);
@@ -42,16 +42,35 @@ module tb_retrofpga_top;
         repeat (5) @(negedge clk);
         btn_reset=0;
         repeat (6) @(negedge clk);
+        // Initial menu state.
         check(0,0);
-        tap(1); check(1,0);
-        tap(1); check(2,0);
-        tap(1); check(3,0);
-        tap(1); check(0,0);
-        tap(0); check(3,0);
-        tap(2); check(3,1);
-        tap(1); check(3,1);
-        tap(3); check(3,0);
-        tap(0); check(2,0);
+
+        // DOWN navigation: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 0.
+        for (int i = 1; i <= 5; i++) begin
+            tap(1);
+            check(3'(i),0);
+        end
+
+        tap(1);
+        check(0,0);
+
+        // UP navigation wraps from 0 to 5.
+        tap(0);
+        check(5,0);
+
+        // All cores are unavailable by default.
+        // SELECT must not enter booting state.
+        tap(2);
+        check(5,0);
+
+        // Navigation remains available after rejected SELECT.
+        tap(0);
+        check(4,0);
+
+        // BACK in menu state does not change selection.
+        tap(3);
+        check(4,0);
+
         // VGA timing should advance, and HSYNC must pulse low.
         begin : vga_check
             bit saw_hsync_low;
@@ -65,7 +84,7 @@ module tb_retrofpga_top;
             if (!saw_hsync_low) $fatal(1,"HSYNC never asserted low");
         end
         tests++;
-        $display("PASS: Tutorial 008 top integration (%0d checks)",tests);
+        $display("PASS: Tutorial 009 six-core top integration (%0d checks)",tests);
         $finish;
     end
     initial begin
