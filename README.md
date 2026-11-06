@@ -6,6 +6,12 @@
 
 RetroFPGA-Basys3 aims to bring four distinct classic and experimental computing systems to a single Artix-7 FPGA platform. A VGA boot menu will let users select a system, load compatible software from microSD, and interact with real RTL hardware cores rather than software CPU emulators.
 
+## Boot Menu Photo
+
+![RetroFPGA boot menu showing SYSTEM READY and the SAP-1, HACK, MOS 6502, Z80, M68000, and DCPU-16 options](docs/images/boot-menu.jpg)
+
+Boot-menu display with SAP-1 selected.
+
 ## Target Systems
 
 | System | CPU architecture | Planned software support | Main integration work |
