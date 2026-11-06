@@ -1,3 +1,27 @@
 obj_dir/
 *.vcd
 *.fst
+
+# Vivado installer
+FPGAs_AdaptiveSoCs_Unified_SDI_*.bin
+
+# Build artifacts
+build/
+*.dcp
+*.rpt
+*.pb
+*.str
+
+# Vivado logs and journals
+*.jou
+*.log
+*.backup.jou
+
+# Local editor settings
+.vscode/
+
+# Temporary backup files
+*.bak
+*.pre-*
+*.before-*
+*.t008
