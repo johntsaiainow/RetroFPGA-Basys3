@@ -9,7 +9,7 @@ set part xc7a35tcpg236-1
 set top retrofpga_top
 
 set sources [list]
-foreach dir {rtl rtl/boot rtl/input rtl/video} {
+foreach dir {rtl rtl/boot rtl/input rtl/video rtl/common cores/sap1} {
     foreach file [glob -nocomplain \
         [file join $root $dir *.sv]] {
         lappend sources $file
