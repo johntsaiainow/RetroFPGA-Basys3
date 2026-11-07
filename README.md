@@ -164,3 +164,65 @@ This project is intended for hardware education, preservation research, and orig
 ---
 
 **Goal:** One Basys 3 board, four distinct hardware computing worlds, and an open, reproducible FPGA development workflow.
+---
+
+## T016.20 — PS/2 Keyboard Compatibility (Hardware Verified)
+
+**Status: HARDWARE ACCEPTANCE PASS — 5/5**
+
+The RetroFPGA boot menu has been verified on a physical Digilent Basys 3 FPGA board using the USB-to-PS/2 keyboard interface.
+
+### Hardware Verification
+
+| Test | Result |
+|---|---|
+| Up Arrow | PASS |
+| Down Arrow | PASS |
+| Enter / Select | PASS |
+| ESC / Back | PASS |
+| Key Release | PASS |
+
+### Root Cause and Fix
+
+The Basys 3 keyboard interface was observed delivering PS/2 Set 2 Up (`0x75`) and Down (`0x72`) scan codes without the extended (`0xE0`) prefix.
+
+T016.20 updates `ps2_keyboard_menu_adapter.sv` to accept both extended and non-extended Up/Down scan codes while preserving Enter (`0x5A`) and ESC (`0x76`) behavior.
+
+Non-extended keypad keys using the same scan codes may also trigger navigation.
+
+### Verification Results
+
+| Verification | Result |
+|---|---|
+| Icarus adapter regression | PASS — 12 checks |
+| Arrow compatibility regression | PASS — 13 cases |
+| Verilator lint | PASS |
+| Vivado synthesis | PASS |
+| Vivado implementation | PASS |
+| FPGA bitstream generation | PASS |
+| Basys 3 hardware acceptance | PASS — 5/5 |
+
+**Vivado Worst Setup Slack: +2.174 ns**
+
+### Build Environment
+
+- Board: Digilent Basys 3
+- FPGA: Xilinx Artix-7 XC7A35T
+- Vivado: 2026.1
+- Verilator: 5.032
+- Simulation: Icarus Verilog
+- Host: Ubuntu Linux
+
+### Development Milestones
+
+| Milestone | Status |
+|---|---|
+| Tutorial 009 — Six-architecture VGA boot menu | Completed |
+| T016.18 — PS/2 event diagnostics | Completed |
+| T016.19 — VGA trace and ILA diagnostics | Completed |
+| T016.20 — Keyboard hardware verification | PASS |
+| T016.21 — Core registry validation | Planned |
+
+**Scope:** T016.20 verifies keyboard navigation and the diagnostic FPGA build. It does not establish that all six CPU architectures are operational.
+
+See [T016.20 Hardware Acceptance](docs/verification/T01620-HARDWARE-ACCEPTANCE.md).
