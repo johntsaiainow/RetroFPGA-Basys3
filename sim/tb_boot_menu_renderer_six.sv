@@ -49,7 +49,10 @@ module tb_boot_menu_renderer_six;
         // Outside menu.
         sample_pixel(63, 128, 12'h000, 1'b0);
         sample_pixel(224, 128, 12'h000, 1'b0);
-        sample_pixel(64, 272, 12'h000, 1'b0);
+        sample_pixel(64, 296, 12'h000, 1'b0);
+
+        // Diagnostics row 6: unselected background.
+        sample_pixel(200, 284, 12'h001, 1'b1);
 
         // Selected row 0, background.
         sample_pixel(200, 140, 12'h024, 1'b1);
@@ -57,8 +60,8 @@ module tb_boot_menu_renderer_six;
         // Unselected row 1, background.
         sample_pixel(200, 164, 12'h001, 1'b1);
 
-        // Verify all six selectable rows.
-        for (int i = 0; i < 6; i++) begin
+        // Verify all seven selectable rows.
+        for (int i = 0; i < 7; i++) begin
             selected_index = 3'(i);
             sample_pixel(200, 140 + i * 24,
                          12'h024, 1'b1);

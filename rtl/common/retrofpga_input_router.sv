@@ -2,6 +2,7 @@
 
 module retrofpga_input_router (
     input  logic menu_active,
+    input  logic diagnostics_active,
 
     input  logic up_pressed,
     input  logic down_pressed,
@@ -32,6 +33,8 @@ module retrofpga_input_router (
             menu_up     = up_pressed;
             menu_down   = down_pressed;
             menu_select = select_pressed;
+        end else if (diagnostics_active) begin
+            menu_back = back_pressed;
         end else begin
             cpu_run     = up_pressed;
             cpu_pause   = down_pressed;

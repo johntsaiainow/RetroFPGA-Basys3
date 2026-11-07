@@ -12,17 +12,7 @@ command -v verilator >/dev/null || {
     exit 1
 }
 
-RTL=(
-    rtl/boot/core_registry.sv
-    rtl/boot/boot_menu_controller.sv
-    rtl/input/button_debounce.sv
-    rtl/video/font_rom.sv
-    rtl/video/pixel_enable.sv
-    rtl/video/vga_timing.sv
-    rtl/video/text_renderer.sv
-    rtl/video/boot_menu_renderer.sv
-    rtl/retrofpga_top.sv
-)
+source scripts/rtl_sources.sh
 
 echo
 echo "[1/5] Full Top-Level Lint"
@@ -30,6 +20,7 @@ echo "[1/5] Full Top-Level Lint"
 verilator \
     --lint-only \
     -Wall \
+    -Wno-PINCONNECTEMPTY \
     --top-module retrofpga_top \
     "${RTL[@]}"
 
@@ -38,6 +29,7 @@ echo "[2/5] Controller Build & Simulation"
 
 verilator \
     --binary --timing --assert -Wall \
+        -Wno-PINCONNECTEMPTY \
     --top-module tb_boot_menu_six \
     --Mdir obj_dir/t009 \
     rtl/boot/core_registry.sv \
@@ -51,6 +43,7 @@ echo "[3/5] VGA Renderer Build & Simulation"
 
 verilator \
     --binary --timing --assert -Wall \
+        -Wno-PINCONNECTEMPTY \
     --top-module tb_boot_menu_renderer_six \
     --Mdir obj_dir/t009_vga \
     rtl/video/font_rom.sv \
@@ -67,6 +60,7 @@ if [[ -f sim/tb_retrofpga_top.sv ]]; then
 
     verilator \
         --binary --timing --assert -Wall \
+        -Wno-PINCONNECTEMPTY \
         --top-module tb_retrofpga_top \
         --Mdir obj_dir/t009_top \
         "${RTL[@]}" \

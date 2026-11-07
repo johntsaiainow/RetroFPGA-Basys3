@@ -285,6 +285,174 @@ module font_rom (
                 default: bitmap = 8'h00;
             endcase
 
+            // C
+            8'h43: case (row)
+                3'd0: bitmap = 8'h3C;
+                3'd1: bitmap = 8'h42;
+                3'd2: bitmap = 8'h40;
+                3'd3: bitmap = 8'h40;
+                3'd4: bitmap = 8'h40;
+                3'd5: bitmap = 8'h42;
+                3'd6: bitmap = 8'h3C;
+                default: bitmap = 8'h00;
+            endcase
+
+            // H
+            8'h48: case (row)
+                3'd0: bitmap = 8'h42;
+                3'd1: bitmap = 8'h42;
+                3'd2: bitmap = 8'h42;
+                3'd3: bitmap = 8'h7E;
+                3'd4: bitmap = 8'h42;
+                3'd5: bitmap = 8'h42;
+                3'd6: bitmap = 8'h42;
+                default: bitmap = 8'h00;
+            endcase
+
+            // J
+            8'h4A: case (row)
+                3'd0: bitmap = 8'h0E;
+                3'd1: bitmap = 8'h04;
+                3'd2: bitmap = 8'h04;
+                3'd3: bitmap = 8'h04;
+                3'd4: bitmap = 8'h44;
+                3'd5: bitmap = 8'h44;
+                3'd6: bitmap = 8'h38;
+                default: bitmap = 8'h00;
+            endcase
+
+            // K
+            8'h4B: case (row)
+                3'd0: bitmap = 8'h44;
+                3'd1: bitmap = 8'h48;
+                3'd2: bitmap = 8'h50;
+                3'd3: bitmap = 8'h60;
+                3'd4: bitmap = 8'h50;
+                3'd5: bitmap = 8'h48;
+                3'd6: bitmap = 8'h44;
+                default: bitmap = 8'h00;
+            endcase
+
+            // Q
+            8'h51: case (row)
+                3'd0: bitmap = 8'h3C;
+                3'd1: bitmap = 8'h42;
+                3'd2: bitmap = 8'h42;
+                3'd3: bitmap = 8'h42;
+                3'd4: bitmap = 8'h4A;
+                3'd5: bitmap = 8'h44;
+                3'd6: bitmap = 8'h3A;
+                default: bitmap = 8'h00;
+            endcase
+
+            // V
+            8'h56: case (row)
+                3'd0: bitmap = 8'h42;
+                3'd1: bitmap = 8'h42;
+                3'd2: bitmap = 8'h42;
+                3'd3: bitmap = 8'h42;
+                3'd4: bitmap = 8'h42;
+                3'd5: bitmap = 8'h24;
+                3'd6: bitmap = 8'h18;
+                default: bitmap = 8'h00;
+            endcase
+
+            // W
+            8'h57: case (row)
+                3'd0: bitmap = 8'h42;
+                3'd1: bitmap = 8'h42;
+                3'd2: bitmap = 8'h42;
+                3'd3: bitmap = 8'h5A;
+                3'd4: bitmap = 8'h5A;
+                3'd5: bitmap = 8'h66;
+                3'd6: bitmap = 8'h42;
+                default: bitmap = 8'h00;
+            endcase
+
+            // Z
+            8'h5A: case (row)
+                3'd0: bitmap = 8'h7E;
+                3'd1: bitmap = 8'h02;
+                3'd2: bitmap = 8'h04;
+                3'd3: bitmap = 8'h08;
+                3'd4: bitmap = 8'h10;
+                3'd5: bitmap = 8'h20;
+                3'd6: bitmap = 8'h7E;
+                default: bitmap = 8'h00;
+            endcase
+
+            // 1
+            8'h31: case (row)
+                3'd0: bitmap = 8'h08;
+                3'd1: bitmap = 8'h18;
+                3'd2: bitmap = 8'h28;
+                3'd3: bitmap = 8'h08;
+                3'd4: bitmap = 8'h08;
+                3'd5: bitmap = 8'h08;
+                3'd6: bitmap = 8'h3E;
+                default: bitmap = 8'h00;
+            endcase
+
+            // 2
+            8'h32: case (row)
+                3'd0: bitmap = 8'h3C;
+                3'd1: bitmap = 8'h42;
+                3'd2: bitmap = 8'h02;
+                3'd3: bitmap = 8'h0C;
+                3'd4: bitmap = 8'h30;
+                3'd5: bitmap = 8'h40;
+                3'd6: bitmap = 8'h7E;
+                default: bitmap = 8'h00;
+            endcase
+
+            // 3
+            8'h33: case (row)
+                3'd0: bitmap = 8'h3C;
+                3'd1: bitmap = 8'h42;
+                3'd2: bitmap = 8'h02;
+                3'd3: bitmap = 8'h1C;
+                3'd4: bitmap = 8'h02;
+                3'd5: bitmap = 8'h42;
+                3'd6: bitmap = 8'h3C;
+                default: bitmap = 8'h00;
+            endcase
+
+            // 5
+            8'h35: case (row)
+                3'd0: bitmap = 8'h7E;
+                3'd1: bitmap = 8'h40;
+                3'd2: bitmap = 8'h7C;
+                3'd3: bitmap = 8'h02;
+                3'd4: bitmap = 8'h02;
+                3'd5: bitmap = 8'h42;
+                3'd6: bitmap = 8'h3C;
+                default: bitmap = 8'h00;
+            endcase
+
+            // 7
+            8'h37: case (row)
+                3'd0: bitmap = 8'h7E;
+                3'd1: bitmap = 8'h02;
+                3'd2: bitmap = 8'h04;
+                3'd3: bitmap = 8'h08;
+                3'd4: bitmap = 8'h10;
+                3'd5: bitmap = 8'h10;
+                3'd6: bitmap = 8'h10;
+                default: bitmap = 8'h00;
+            endcase
+
+            // 9
+            8'h39: case (row)
+                3'd0: bitmap = 8'h3C;
+                3'd1: bitmap = 8'h42;
+                3'd2: bitmap = 8'h42;
+                3'd3: bitmap = 8'h3E;
+                3'd4: bitmap = 8'h02;
+                3'd5: bitmap = 8'h04;
+                3'd6: bitmap = 8'h38;
+                default: bitmap = 8'h00;
+            endcase
+
             default: bitmap = 8'h00;
 
         endcase

@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 
 // RetroFPGA Tutorial 009
-// Six-row VGA boot menu, 8x8 glyphs, 24-pixel row pitch.
+// Seven-row VGA boot menu, 8x8 glyphs, 24-pixel row pitch.
 
 module boot_menu_renderer (
     input  logic [9:0] x, y,
@@ -23,7 +23,7 @@ module boot_menu_renderer (
 
     assign in_menu = video_active &&
                      x >= 10'd64 && x < 10'd224 &&
-                     y >= 10'd128 && y < 10'd272;
+                     y >= 10'd128 && y < 10'd296;
 
     assign lx = x[7:0] - 8'd64;
     assign ly = y - 10'd128;
@@ -34,7 +34,8 @@ module boot_menu_renderer (
         else if (ly < 10'd72)  line_index = 3'd2;
         else if (ly < 10'd96)  line_index = 3'd3;
         else if (ly < 10'd120) line_index = 3'd4;
-        else                   line_index = 3'd5;
+        else if (ly < 10'd144) line_index = 3'd5;
+        else                   line_index = 3'd6;
     end
 
     assign char_index = lx[7:3];
@@ -85,6 +86,21 @@ module boot_menu_renderer (
                 2: ascii="P"; 3: ascii="U";
                 4: ascii="-"; 5: ascii="1";
                 6: ascii="6";
+                default: ascii=" ";
+            endcase
+
+
+            3'd6: case (char_index)
+                0: ascii="K";  1: ascii="E";
+                2: ascii="Y";  3: ascii="B";
+                4: ascii="O";  5: ascii="A";
+                6: ascii="R";  7: ascii="D";
+                8: ascii=" ";  9: ascii="D";
+                10: ascii="I"; 11: ascii="A";
+                12: ascii="G"; 13: ascii="N";
+                14: ascii="O"; 15: ascii="S";
+                16: ascii="T"; 17: ascii="I";
+                18: ascii="C"; 19: ascii="S";
                 default: ascii=" ";
             endcase
 

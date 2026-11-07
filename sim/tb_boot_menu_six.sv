@@ -1,6 +1,7 @@
 `timescale 1ns/1ps
 
 module tb_boot_menu_six;
+    wire diagnostics_active;
 
     logic clk = 0;
     always #5 clk <= ~clk;
@@ -31,12 +32,15 @@ module tb_boot_menu_six;
         .menu_active(menu_active),
         .boot_core(boot_core),
         .boot_request(boot_request),
-        .booting(booting)
+        .booting(booting),
+        .diagnostics_active(diagnostics_active)
     );
 
     task automatic tick;
         @(posedge clk);
         #1;
+        if (diagnostics_active && booting)
+            $fatal(1, "Diagnostics and booting cannot both be active");
     endtask
 
     task automatic press_down;
@@ -82,29 +86,48 @@ module tb_boot_menu_six;
         assert(selected_index == 0);
         assert(menu_active);
 
-        // Navigate through all six architectures.
-        for (int i = 1; i <= 5; i++) begin
+        // Six CPU architectures plus one Diagnostics entry.
+        for (int i = 1; i <= 6; i++) begin
             press_down();
             assert(selected_index == 3'(i))
                 else $fatal(1, "Navigation failed at %0d", i);
         end
 
-        // Wrap 5 -> 0.
+        // Wrap 6 -> 0.
         press_down();
         assert(selected_index == 0)
             else $fatal(1, "Down wrap failed");
 
-        // Wrap 0 -> 5.
+        // Wrap 0 -> 6.
+        press_up();
+        assert(selected_index == 6)
+            else $fatal(1, "Up wrap failed");
+
+        // Diagnostics is not a CPU core.
+        press_select();
+        assert(diagnostics_active && !menu_active &&
+               !booting && !boot_request)
+            else $fatal(1, "Diagnostics entry failed");
+
+        // BACK returns from Diagnostics to the menu.
+        press_back();
+        assert(menu_active && !diagnostics_active && !booting)
+            else $fatal(1, "Diagnostics BACK failed");
+
+        // Move from Diagnostics (6) to DCPU-16 (5).
         press_up();
         assert(selected_index == 5)
-            else $fatal(1, "Up wrap failed");
+            else $fatal(1, "DCPU-16 selection failed");
 
         // DCPU-16 is not implemented.
         press_select();
-        assert(menu_active && !booting && !boot_request)
+        assert(menu_active && !booting && !boot_request &&
+               !diagnostics_active)
             else $fatal(1, "Unavailable core booted");
 
-        // Return to SAP-1.
+        // Return to SAP-1 through Diagnostics menu entry.
+        press_down();
+        assert(selected_index == 6);
         press_down();
         assert(selected_index == 0);
 
