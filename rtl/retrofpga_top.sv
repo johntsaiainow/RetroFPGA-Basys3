@@ -44,9 +44,10 @@ module retrofpga_top #(
     logic [3:0] title_r, title_g, title_b;
     logic [11:0] menu_rgb, final_rgb;
     logic menu_opaque;
-    logic [7:0] sap_out, sap_acc;
+    logic [7:0] sap_out, sap_acc, sap_ir;
     logic [3:0] sap_pc;
     logic sap_halted;
+    logic sap_running;
     logic sap_active;
 
     logic [11:0] sap_rgb;
@@ -59,6 +60,19 @@ module retrofpga_top #(
     logic keyboard_timeout_error;
     logic keyboard_accepted_edge;
     logic diagnostics_active;
+
+    // T016: decoded keyboard events.
+    logic [7:0] keyboard_key_code;
+    logic keyboard_key_extended;
+    logic keyboard_key_pressed;
+    logic keyboard_key_valid;
+    logic keyboard_bat_seen;
+
+    logic keyboard_up, keyboard_down;
+    logic keyboard_select, keyboard_back;
+
+    logic combined_up, combined_down;
+    logic combined_select, combined_back;
 
     logic [15:0] ps2_raw_edges;
     logic [15:0] ps2_accepted_edges;
@@ -129,6 +143,38 @@ module retrofpga_top #(
         .timeout_count(ps2_timeouts)
     );
 
+    // T016: PS/2 Set 2 event decoder.
+    ps2_set2_decoder keyboard_decoder (
+        .clk(clk),
+        .rst(reset_sync),
+        .scan_code(keyboard_scan_code),
+        .scan_valid(keyboard_scan_valid),
+        .frame_error(keyboard_frame_error || keyboard_timeout_error),
+        .key_code(keyboard_key_code),
+        .key_extended(keyboard_key_extended),
+        .key_pressed(keyboard_key_pressed),
+        .key_valid(keyboard_key_valid),
+        .bat_seen(keyboard_bat_seen)
+    );
+
+    // T016: translate decoded events into menu actions.
+    ps2_keyboard_menu_adapter keyboard_menu_adapter (
+        .key_valid(keyboard_key_valid),
+        .key_code(keyboard_key_code),
+        .key_extended(keyboard_key_extended),
+        .key_pressed(keyboard_key_pressed),
+        .key_up(keyboard_up),
+        .key_down(keyboard_down),
+        .key_select(keyboard_select),
+        .key_back(keyboard_back)
+    );
+
+    // Preserve the existing physical button controls.
+    assign combined_up     = up_pressed     || keyboard_up;
+    assign combined_down   = down_pressed   || keyboard_down;
+    assign combined_select = select_pressed || keyboard_select;
+    assign combined_back   = back_pressed   || keyboard_back;
+
     pixel_enable pixel_clock (.clk(clk), .rst(reset_sync), .pixel_ce(pixel_ce));
     vga_timing timing (.clk(clk), .rst(reset_sync), .pixel_ce(pixel_ce),
         .hsync(hsync), .vsync(vsync), .video_active(video_active), .x(x), .y(y));
@@ -185,10 +231,10 @@ module retrofpga_top #(
     retrofpga_input_router input_router (
         .menu_active(menu_active),
         .diagnostics_active(diagnostics_active),
-        .up_pressed(up_pressed),
-        .down_pressed(down_pressed),
-        .select_pressed(select_pressed),
-        .back_pressed(back_pressed),
+        .up_pressed(combined_up),
+        .down_pressed(combined_down),
+        .select_pressed(combined_select),
+        .back_pressed(combined_back),
         .menu_up(menu_up),
         .menu_down(menu_down),
         .menu_select(menu_select),
@@ -213,18 +259,20 @@ module retrofpga_top #(
         .step_pressed(cpu_step_pressed),
         .cpu_halted(sap_halted),
         .step_en(cpu_step),
-        .running()
+        .running(sap_running)
     );
 
     sap1_core cpu (
         .clk(clk), .rst(sap_reset), .step_en(cpu_step),
         .out_port(sap_out), .out_valid(),
-        .halted(sap_halted), .pc_debug(sap_pc), .acc_debug(sap_acc)
+        .halted(sap_halted), .pc_debug(sap_pc),
+        .acc_debug(sap_acc), .ir_debug(sap_ir)
     );
     sap1_vga_monitor monitor (
         .x(x), .y(y), .video_active(video_active),
         .pc(sap_pc), .acc(sap_acc), .out_port(sap_out),
-        .halted(sap_halted), .rgb(sap_rgb)
+        .halted(sap_halted), .ir(sap_ir),
+        .running(sap_running), .rgb(sap_rgb)
     );
 
     always_comb begin

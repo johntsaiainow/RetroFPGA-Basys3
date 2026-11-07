@@ -14,6 +14,8 @@ RTL=(
 
     rtl/input/button_debounce.sv
     rtl/input/ps2_keyboard_receiver.sv
+    rtl/input/ps2_set2_decoder.sv
+    rtl/input/ps2_keyboard_menu_adapter.sv
     rtl/input/ps2_keyboard_diagnostics.sv
     rtl/input/ps2_edge_counters.sv
 

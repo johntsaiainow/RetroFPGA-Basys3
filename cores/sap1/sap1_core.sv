@@ -10,7 +10,8 @@ module sap1_core (
     output logic       out_valid,
     output logic       halted,
     output logic [3:0] pc_debug,
-    output logic [7:0] acc_debug
+    output logic [7:0] acc_debug,
+    output logic [7:0] ir_debug
 );
     typedef enum logic [1:0] {FETCH, EXECUTE, HALTED} state_t;
     state_t state;
@@ -34,6 +35,7 @@ module sap1_core (
     assign halted    = (state == HALTED);
     assign pc_debug  = pc;
     assign acc_debug = acc;
+    assign ir_debug  = ir;
 
     always_ff @(posedge clk) begin
         if (rst) begin

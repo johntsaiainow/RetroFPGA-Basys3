@@ -19,6 +19,8 @@ module tb_sap1_vga_decimal;
         .acc(acc),
         .out_port(out_port),
         .halted(halted),
+        .ir(8'h00),
+        .running(1'b1),
         .rgb(rgb)
     );
 

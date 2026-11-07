@@ -5,6 +5,8 @@ module sap1_vga_monitor (
     input logic [3:0] pc,
     input logic [7:0] acc, out_port,
     input logic halted,
+    input logic [7:0] ir,
+    input logic running,
     output logic [11:0] rgb
 );
     logic [7:0] ascii, bitmap;
@@ -84,6 +86,16 @@ module sap1_vga_monitor (
                 default: ascii=" ";
             endcase
 
+            4: case (col)
+                0: ascii="I"; 1: ascii="R";
+                3: ascii="H"; 4: ascii="E"; 5: ascii="X";
+                6: ascii=":";
+                8: ascii="0"; 9: ascii="X";
+                10: ascii=hex_ascii(ir[7:4]);
+                11: ascii=hex_ascii(ir[3:0]);
+                default: ascii=" ";
+            endcase
+
             5: case (col)
                 0: ascii="A"; 1: ascii="C"; 2: ascii="C";
                 4: ascii="H"; 5: ascii="E"; 6: ascii="X";
@@ -127,10 +139,11 @@ module sap1_vga_monitor (
             11: case (col)
                 0: ascii="S"; 1: ascii="T"; 2: ascii="A";
                 3: ascii="T"; 4: ascii="E"; 5: ascii=":";
-                7:  ascii=halted ? "H" : "R";
-                8:  ascii=halted ? "A" : "U";
-                9:  ascii=halted ? "L" : "N";
-                10: ascii=halted ? "T" : " ";
+                7:  ascii=halted ? "H" : (running ? "R" : "P");
+                8:  ascii=halted ? "A" : (running ? "U" : "A");
+                9:  ascii=halted ? "L" : (running ? "N" : "U");
+                10: ascii=halted ? "T" : (running ? " " : "S");
+                11: ascii=halted ? " " : (running ? " " : "E");
                 default: ascii=" ";
             endcase
 
@@ -155,6 +168,7 @@ module sap1_vga_monitor (
             "B": case(glyph_y) 0,3,6:bitmap=8'h7c;1,2,4,5:bitmap=8'h42;default:;endcase
             "C": case(glyph_y) 0,6:bitmap=8'h3c;1,5:bitmap=8'h42;2,3,4:bitmap=8'h40;default:;endcase
             "E": case(glyph_y) 0,3,6:bitmap=8'h7e;1,2,4,5:bitmap=8'h40;default:;endcase
+            "I": case(glyph_y) 0,6:bitmap=8'h3e;1,2,3,4,5:bitmap=8'h08;default:bitmap=8'h00;endcase
             "H": case(glyph_y) 3:bitmap=8'h7e;0,1,2,4,5,6:bitmap=8'h42;default:;endcase
             "K": case(glyph_y) 0:bitmap=8'h44;1:bitmap=8'h48;2:bitmap=8'h50;3:bitmap=8'h60;4:bitmap=8'h50;5:bitmap=8'h48;6:bitmap=8'h44;default:;endcase
             "L": case(glyph_y) 6:bitmap=8'h7e;0,1,2,3,4,5:bitmap=8'h40;default:;endcase
